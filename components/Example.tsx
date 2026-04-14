@@ -78,9 +78,9 @@ export default function Example() {
       <Count $isEven={isEven}>{count}</Count>
       <Label>{isEven ? '짝수' : '홀수'}</Label>
       <ButtonGroup>
-        <Button onClick={() => setCount((c) => c - 1)}>-1</Button>
-        <Button onClick={() => setCount((c) => c + 1)}>+1</Button>
-        <ResetButton onClick={() => setCount(0)}>초기화</ResetButton>
+        <Button aria-label="카운터 1 감소" onClick={() => setCount((c) => c - 1)}>-1</Button>
+        <Button aria-label="카운터 1 증가" onClick={() => setCount((c) => c + 1)}>+1</Button>
+        <ResetButton aria-label="카운터 초기화" onClick={() => setCount(0)}>초기화</ResetButton>
       </ButtonGroup>
     </Wrapper>
   );
