@@ -9,6 +9,7 @@ export const theme = {
       secondary: '#6b7280',
     },
     border: '#e5e7eb',
+    white: '#ffffff',
     error: '#ef4444',
     success: '#22c55e',
   },
@@ -42,6 +43,7 @@ export const theme = {
     '2xl': '1.5rem',
     '3xl': '1.875rem',
     '4xl': '2.25rem',
+    '5xl': '3rem',
   },
   spacing: {
     xs: '0.25rem',
