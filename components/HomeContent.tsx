@@ -7,9 +7,9 @@
  * 다크 테마 랜딩 페이지. Framer Motion으로 스크롤 기반 애니메이션을 적용합니다.
  */
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 
 /* ------------------------------------------------------------------ */
 /* 애니메이션 variants                                                   */
@@ -28,7 +28,7 @@ const fadeInVariants = {
 const staggerContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.12 },
+    transition: { staggerChildren: 0.09 },
   },
 };
 
@@ -99,7 +99,7 @@ const HeroSection = styled.section`
   background: linear-gradient(
     135deg,
     ${({ theme }) => theme.colors.secondary} 0%,
-    #1e1b4b 60%,
+    ${({ theme }) => theme.colors.gradient.heroMid} 60%,
     ${({ theme }) => theme.colors.background} 100%
   );
   color: ${({ theme }) => theme.colors.white};
@@ -112,7 +112,7 @@ const HeroGlow = styled.div`
   width: 600px;
   height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, ${({ theme }) => theme.colors.glow} 0%, transparent 70%);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -123,11 +123,11 @@ const HeroGlow = styled.div`
 const HeroBadge = styled(motion.span)`
   display: inline-block;
   padding: ${({ theme }) => `${theme.spacing.xs} ${theme.spacing.md}`};
-  background: rgba(99, 102, 241, 0.2);
-  border: 1px solid rgba(99, 102, 241, 0.4);
+  background: ${({ theme }) => theme.colors.glowHover};
+  border: 1px solid ${({ theme }) => theme.colors.glowBorder};
   border-radius: ${({ theme }) => theme.borderRadius.full};
   font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: #a5b4fc;
+  color: ${({ theme }) => theme.colors.accent.light};
   font-weight: 500;
 `;
 
@@ -135,7 +135,7 @@ const HeroTitle = styled(motion.h1)`
   font-size: ${({ theme }) => theme.fontSizes['4xl']};
   font-weight: 800;
   line-height: 1.15;
-  background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+  background: linear-gradient(135deg, ${({ theme }) => theme.colors.white} 0%, ${({ theme }) => theme.colors.accent.light} 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -147,7 +147,7 @@ const HeroTitle = styled(motion.h1)`
 
 const HeroSubtitle = styled(motion.p)`
   font-size: ${({ theme }) => theme.fontSizes.lg};
-  color: #c7c9d1;
+  color: ${({ theme }) => theme.colors.accent.muted};
   max-width: 560px;
   line-height: 1.7;
 `;
@@ -168,10 +168,15 @@ const CTAButtonPrimary = styled(motion.a)`
   font-size: ${({ theme }) => theme.fontSizes.md};
   border-radius: ${({ theme }) => theme.borderRadius.full};
   cursor: pointer;
-  box-shadow: 0 0 24px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 24px ${({ theme }) => theme.colors.glowBorder};
 
   &:hover {
     text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.white};
+    outline-offset: 2px;
   }
 `;
 
@@ -188,6 +193,11 @@ const CTAButtonSecondary = styled(motion.a)`
 
   &:hover {
     text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 2px;
   }
 `;
 
@@ -248,8 +258,8 @@ const FeatureCard = styled(motion.div)`
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    border-color: rgba(99, 102, 241, 0.4);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+    border-color: ${({ theme }) => theme.colors.glowBorder};
+    box-shadow: 0 0 20px ${({ theme }) => theme.colors.glowCard};
   }
 `;
 
@@ -275,7 +285,7 @@ const FeatureDescription = styled.p`
 
 const StatsSection = styled.section`
   padding: ${({ theme }) => `${theme.spacing['3xl']} ${theme.spacing['2xl']}`};
-  background: linear-gradient(180deg, ${({ theme }) => theme.colors.background} 0%, #0d0d1f 100%);
+  background: linear-gradient(180deg, ${({ theme }) => theme.colors.background} 0%, ${({ theme }) => theme.colors.gradient.sectionDark} 100%);
 `;
 
 const StatsGrid = styled(motion.div)`
@@ -319,7 +329,8 @@ const StatLabel = styled.div`
 
 const TestimonialsSection = styled.section`
   padding: ${({ theme }) => `${theme.spacing['3xl']} ${theme.spacing['2xl']}`};
-  background-color: #0d0d1f;
+  background-color: ${({ theme }) => theme.colors.gradient.sectionDark};
+  overflow: hidden;
 `;
 
 const TestimonialsGrid = styled.div`
@@ -374,7 +385,7 @@ const AuthorAvatar = styled.div<{ $color: string }>`
 const AuthorInfo = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: ${({ theme }) => theme.spacing.xs};
 `;
 
 const AuthorName = styled.span`
@@ -389,7 +400,7 @@ const AuthorRole = styled.span`
 `;
 
 const StarRating = styled.div`
-  color: #f59e0b;
+  color: ${({ theme }) => theme.colors.star};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   letter-spacing: 2px;
 `;
@@ -432,7 +443,12 @@ const FAQQuestion = styled.button`
   gap: ${({ theme }) => theme.spacing.md};
 
   &:hover {
-    background: rgba(99, 102, 241, 0.08);
+    background: ${({ theme }) => theme.colors.glowHover};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.primary};
+    outline-offset: -2px;
   }
 `;
 
@@ -466,7 +482,12 @@ const CTASection = styled.section`
   text-align: center;
   gap: ${({ theme }) => theme.spacing.xl};
   padding: ${({ theme }) => `${theme.spacing['3xl']} ${theme.spacing['2xl']}`};
-  background: linear-gradient(135deg, #0d0d1f 0%, #1e1b4b 50%, #0d0d1f 100%);
+  background: linear-gradient(
+    135deg,
+    ${({ theme }) => theme.colors.gradient.sectionDark} 0%,
+    ${({ theme }) => theme.colors.gradient.heroMid} 50%,
+    ${({ theme }) => theme.colors.gradient.sectionDark} 100%
+  );
   border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
@@ -485,6 +506,13 @@ const CTADescription = styled.p`
   color: ${({ theme }) => theme.colors.text.secondary};
   max-width: 480px;
   line-height: 1.7;
+`;
+
+const CTAContent = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing['2xl']};
 `;
 
 /* ------------------------------------------------------------------ */
@@ -528,7 +556,7 @@ const FooterTagline = styled.p`
   max-width: 300px;
 `;
 
-const FooterColumn = styled.div`
+const FooterNav = styled.nav`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.md};
@@ -647,7 +675,13 @@ const FAQ_ITEMS = [
 /* FAQ 아이템 컴포넌트                                                   */
 /* ------------------------------------------------------------------ */
 
-function FAQItemComponent({ question, answer }: { question: string; answer: string }) {
+const FAQItemComponent = memo(function FAQItemComponent({
+  question,
+  answer,
+}: {
+  question: string;
+  answer: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -673,7 +707,7 @@ function FAQItemComponent({ question, answer }: { question: string; answer: stri
       </AnimatePresence>
     </FAQItem>
   );
-}
+});
 
 /* ------------------------------------------------------------------ */
 /* 메인 컴포넌트                                                         */
@@ -681,259 +715,260 @@ function FAQItemComponent({ question, answer }: { question: string; answer: stri
 
 export default function HomeContent() {
   return (
-    <Page>
-      {/* Hero 섹션 */}
-      <HeroSection>
-        <HeroGlow />
-        <HeroBadge
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          ✨ Next.js 15 · Framer Motion · TypeScript
-        </HeroBadge>
-        <HeroTitle
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-        >
-          더 나은 대시보드를<br />경험하세요
-        </HeroTitle>
-        <HeroSubtitle
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
-          Next.js · TypeScript · Styled-Components · Jotai · Framer Motion으로
-          구축된 현대적인 웹 애플리케이션 플랫폼. 빠르고, 안전하고, 아름답습니다.
-        </HeroSubtitle>
-        <HeroButtons
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45 }}
-        >
-          <CTAButtonPrimary
-            href="#features"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+    <MotionConfig reducedMotion="user">
+      <Page>
+        {/* Hero 섹션 */}
+        <HeroSection>
+          <HeroGlow />
+          <HeroBadge
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            시작하기
-          </CTAButtonPrimary>
-          <CTAButtonSecondary
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            ✨ Next.js 15 · Framer Motion · TypeScript
+          </HeroBadge>
+          <HeroTitle
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
           >
-            GitHub 보기
-          </CTAButtonSecondary>
-        </HeroButtons>
-        <ScrollIndicator
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.9 }}
-        >
-          <span>스크롤</span>
-          <ScrollArrow
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </ScrollIndicator>
-      </HeroSection>
-
-      {/* Features 섹션 */}
-      <FeaturesSection id="features">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeUpVariants}
-          transition={{ duration: 0.5 }}
-        >
-          <SectionTitle>주요 기능</SectionTitle>
-          <SectionSubtitle>
-            엔터프라이즈 수준의 기능을 처음부터 내장한 현대적인 개발 플랫폼을 경험하세요.
-          </SectionSubtitle>
-        </motion.div>
-        <FeatureGrid
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-        >
-          {FEATURES.map((feature) => (
-            <FeatureCard
-              key={feature.title}
-              variants={fadeUpVariants}
-              transition={{ duration: 0.5 }}
-              whileHover={{ y: -4 }}
+            더 나은 대시보드를<br />경험하세요
+          </HeroTitle>
+          <HeroSubtitle
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            Next.js · TypeScript · Styled-Components · Jotai · Framer Motion으로
+            구축된 현대적인 웹 애플리케이션 플랫폼. 빠르고, 안전하고, 아름답습니다.
+          </HeroSubtitle>
+          <HeroButtons
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.45 }}
+          >
+            <CTAButtonPrimary
+              href="#features"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <FeatureIcon>{feature.icon}</FeatureIcon>
-              <FeatureTitle>{feature.title}</FeatureTitle>
-              <FeatureDescription>{feature.description}</FeatureDescription>
-            </FeatureCard>
-          ))}
-        </FeatureGrid>
-      </FeaturesSection>
-
-      {/* Stats 섹션 */}
-      <StatsSection>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={fadeUpVariants}
-          transition={{ duration: 0.5 }}
-        >
-          <SectionTitle>수치로 증명합니다</SectionTitle>
-          <SectionSubtitle>
-            전 세계 개발팀이 신뢰하는 플랫폼의 실제 성과입니다.
-          </SectionSubtitle>
-        </motion.div>
-        <StatsGrid
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          {STATS.map((stat) => (
-            <StatCard
-              key={stat.label}
-              variants={fadeUpVariants}
-              transition={{ duration: 0.5 }}
+              시작하기
+            </CTAButtonPrimary>
+            <CTAButtonSecondary
+              href="https://github.com/vercel/next.js"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <StatValue>{stat.value}</StatValue>
-              <StatLabel>{stat.label}</StatLabel>
-            </StatCard>
-          ))}
-        </StatsGrid>
-      </StatsSection>
+              GitHub 보기
+            </CTAButtonSecondary>
+          </HeroButtons>
+          <ScrollIndicator
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+          >
+            <span>스크롤</span>
+            <ScrollArrow
+              animate={{ y: [0, 6, 0] }}
+              transition={{ duration: 1.2, repeat: 6, ease: 'easeInOut' }}
+            />
+          </ScrollIndicator>
+        </HeroSection>
 
-      {/* Testimonials 섹션 */}
-      <TestimonialsSection>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeUpVariants}
-          transition={{ duration: 0.5 }}
-        >
-          <SectionTitle>개발자들의 이야기</SectionTitle>
-          <SectionSubtitle>
-            실제로 사용하는 개발자들이 직접 남긴 솔직한 후기입니다.
-          </SectionSubtitle>
-        </motion.div>
-        <TestimonialsGrid>
-          {TESTIMONIALS.map((testimonial, index) => (
-            <TestimonialCard
-              key={testimonial.name}
-              variants={index % 2 === 0 ? slideLeftVariants : slideRightVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <StarRating>★★★★★</StarRating>
-              <TestimonialText>&ldquo;{testimonial.text}&rdquo;</TestimonialText>
-              <TestimonialAuthor>
-                <AuthorAvatar $color={testimonial.color}>
-                  {testimonial.initial}
-                </AuthorAvatar>
-                <AuthorInfo>
-                  <AuthorName>{testimonial.name}</AuthorName>
-                  <AuthorRole>{testimonial.role}</AuthorRole>
-                </AuthorInfo>
-              </TestimonialAuthor>
-            </TestimonialCard>
-          ))}
-        </TestimonialsGrid>
-      </TestimonialsSection>
-
-      {/* FAQ 섹션 */}
-      <FAQSection>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeUpVariants}
-          transition={{ duration: 0.5 }}
-        >
-          <SectionTitle>자주 묻는 질문</SectionTitle>
-          <SectionSubtitle>
-            궁금한 점이 있으시면 GitHub Issues나 디스코드 채널로도 문의하실 수 있습니다.
-          </SectionSubtitle>
-        </motion.div>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-          variants={fadeInVariants}
-          transition={{ duration: 0.5 }}
-        >
-          <FAQList>
-            {FAQ_ITEMS.map((item) => (
-              <FAQItemComponent key={item.question} question={item.question} answer={item.answer} />
+        {/* Features 섹션 */}
+        <FeaturesSection id="features">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUpVariants}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionTitle>주요 기능</SectionTitle>
+            <SectionSubtitle>
+              엔터프라이즈 수준의 기능을 처음부터 내장한 현대적인 개발 플랫폼을 경험하세요.
+            </SectionSubtitle>
+          </motion.div>
+          <FeatureGrid
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            {FEATURES.map((feature) => (
+              <FeatureCard
+                key={feature.title}
+                variants={fadeUpVariants}
+                transition={{ duration: 0.5 }}
+                whileHover={{ y: -4 }}
+              >
+                <FeatureIcon>{feature.icon}</FeatureIcon>
+                <FeatureTitle>{feature.title}</FeatureTitle>
+                <FeatureDescription>{feature.description}</FeatureDescription>
+              </FeatureCard>
             ))}
-          </FAQList>
-        </motion.div>
-      </FAQSection>
+          </FeatureGrid>
+        </FeaturesSection>
 
-      {/* CTA 섹션 */}
-      <CTASection>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.4 }}
-          variants={fadeUpVariants}
-          transition={{ duration: 0.5 }}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}
-        >
-          <CTATitle>지금 바로 시작하세요</CTATitle>
-          <CTADescription>
-            보일러플레이트를 활용해 빠르게 프로젝트를 시작하고, 팀과 함께 성장하세요.
-            무료로 시작할 수 있으며 신용카드가 필요 없습니다.
-          </CTADescription>
-          <CTAButtonPrimary
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.95 }}
+        {/* Stats 섹션 */}
+        <StatsSection>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUpVariants}
+            transition={{ duration: 0.5 }}
           >
-            GitHub에서 보기
-          </CTAButtonPrimary>
-        </motion.div>
-      </CTASection>
+            <SectionTitle>수치로 증명합니다</SectionTitle>
+            <SectionSubtitle>
+              전 세계 개발팀이 신뢰하는 플랫폼의 실제 성과입니다.
+            </SectionSubtitle>
+          </motion.div>
+          <StatsGrid
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {STATS.map((stat) => (
+              <StatCard
+                key={stat.label}
+                variants={fadeUpVariants}
+                transition={{ duration: 0.5 }}
+              >
+                <StatValue>{stat.value}</StatValue>
+                <StatLabel>{stat.label}</StatLabel>
+              </StatCard>
+            ))}
+          </StatsGrid>
+        </StatsSection>
 
-      {/* Footer */}
-      <Footer>
-        <FooterInner>
-          <FooterBrand>
-            <FooterLogo>◆ DashBoard</FooterLogo>
-            <FooterTagline>
-              현대적인 웹 개발을 위한 Next.js 보일러플레이트. 빠른 개발, 견고한 구조, 아름다운 UI를 한 번에.
-            </FooterTagline>
-          </FooterBrand>
-          <FooterColumn>
-            <FooterColumnTitle>제품</FooterColumnTitle>
-            <FooterLink href="#features">기능 소개</FooterLink>
-            <FooterLink href="#" target="_blank" rel="noopener noreferrer">문서</FooterLink>
-            <FooterLink href="#" target="_blank" rel="noopener noreferrer">변경 로그</FooterLink>
-            <FooterLink href="#" target="_blank" rel="noopener noreferrer">로드맵</FooterLink>
-          </FooterColumn>
-          <FooterColumn>
-            <FooterColumnTitle>리소스</FooterColumnTitle>
-            <FooterLink href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</FooterLink>
-            <FooterLink href="https://nextjs.org" target="_blank" rel="noopener noreferrer">Next.js 공식 문서</FooterLink>
-            <FooterLink href="https://www.framer.com/motion/" target="_blank" rel="noopener noreferrer">Framer Motion</FooterLink>
-            <FooterLink href="#" target="_blank" rel="noopener noreferrer">디스코드 커뮤니티</FooterLink>
-          </FooterColumn>
-        </FooterInner>
-        <FooterBottom>
-          © 2026 DashBoard. MIT 라이선스로 배포됩니다.
-        </FooterBottom>
-      </Footer>
-    </Page>
+        {/* Testimonials 섹션 */}
+        <TestimonialsSection>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUpVariants}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionTitle>개발자들의 이야기</SectionTitle>
+            <SectionSubtitle>
+              실제로 사용하는 개발자들이 직접 남긴 솔직한 후기입니다.
+            </SectionSubtitle>
+          </motion.div>
+          <TestimonialsGrid>
+            {TESTIMONIALS.map((testimonial, index) => (
+              <TestimonialCard
+                key={testimonial.name}
+                variants={index % 2 === 0 ? slideLeftVariants : slideRightVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.5, delay: index * 0.07 }}
+              >
+                <StarRating>★★★★★</StarRating>
+                <TestimonialText>&ldquo;{testimonial.text}&rdquo;</TestimonialText>
+                <TestimonialAuthor>
+                  <AuthorAvatar $color={testimonial.color}>
+                    {testimonial.initial}
+                  </AuthorAvatar>
+                  <AuthorInfo>
+                    <AuthorName>{testimonial.name}</AuthorName>
+                    <AuthorRole>{testimonial.role}</AuthorRole>
+                  </AuthorInfo>
+                </TestimonialAuthor>
+              </TestimonialCard>
+            ))}
+          </TestimonialsGrid>
+        </TestimonialsSection>
+
+        {/* FAQ 섹션 */}
+        <FAQSection>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUpVariants}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionTitle>자주 묻는 질문</SectionTitle>
+            <SectionSubtitle>
+              궁금한 점이 있으시면 GitHub Issues나 디스코드 채널로도 문의하실 수 있습니다.
+            </SectionSubtitle>
+          </motion.div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            variants={fadeInVariants}
+            transition={{ duration: 0.5 }}
+          >
+            <FAQList>
+              {FAQ_ITEMS.map((item) => (
+                <FAQItemComponent key={item.question} question={item.question} answer={item.answer} />
+              ))}
+            </FAQList>
+          </motion.div>
+        </FAQSection>
+
+        {/* CTA 섹션 */}
+        <CTASection>
+          <CTAContent
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.4 }}
+            variants={fadeUpVariants}
+            transition={{ duration: 0.5 }}
+          >
+            <CTATitle>지금 바로 시작하세요</CTATitle>
+            <CTADescription>
+              보일러플레이트를 활용해 빠르게 프로젝트를 시작하고, 팀과 함께 성장하세요.
+              무료로 시작할 수 있으며 신용카드가 필요 없습니다.
+            </CTADescription>
+            <CTAButtonPrimary
+              href="https://github.com/vercel/next.js"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.06 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              GitHub에서 보기
+            </CTAButtonPrimary>
+          </CTAContent>
+        </CTASection>
+
+        {/* Footer */}
+        <Footer>
+          <FooterInner>
+            <FooterBrand>
+              <FooterLogo>◆ DashBoard</FooterLogo>
+              <FooterTagline>
+                현대적인 웹 개발을 위한 Next.js 보일러플레이트. 빠른 개발, 견고한 구조, 아름다운 UI를 한 번에.
+              </FooterTagline>
+            </FooterBrand>
+            <FooterNav aria-label="제품">
+              <FooterColumnTitle>제품</FooterColumnTitle>
+              <FooterLink href="#features">기능 소개</FooterLink>
+              <FooterLink href="#features">문서</FooterLink>
+              <FooterLink href="#features">변경 로그</FooterLink>
+              <FooterLink href="#features">로드맵</FooterLink>
+            </FooterNav>
+            <FooterNav aria-label="리소스">
+              <FooterColumnTitle>리소스</FooterColumnTitle>
+              <FooterLink href="https://github.com/vercel/next.js" target="_blank" rel="noopener noreferrer">GitHub</FooterLink>
+              <FooterLink href="https://nextjs.org" target="_blank" rel="noopener noreferrer">Next.js 공식 문서</FooterLink>
+              <FooterLink href="https://www.framer.com/motion/" target="_blank" rel="noopener noreferrer">Framer Motion</FooterLink>
+              <FooterLink href="#features">디스코드 커뮤니티</FooterLink>
+            </FooterNav>
+          </FooterInner>
+          <FooterBottom>
+            © 2026 DashBoard. MIT 라이선스로 배포됩니다.
+          </FooterBottom>
+        </Footer>
+      </Page>
+    </MotionConfig>
   );
 }
