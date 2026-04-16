@@ -28,13 +28,14 @@ const HeroSection = styled.section`
   align-items: center;
   justify-content: center;
   text-align: center;
+  min-height: 60vh;
   padding: ${({ theme }) => `${theme.spacing['3xl']} ${theme.spacing['2xl']}`};
   background: linear-gradient(
     135deg,
     ${({ theme }) => theme.colors.secondary} 0%,
     ${({ theme }) => theme.colors.primary} 100%
   );
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.white};
   gap: ${({ theme }) => theme.spacing.xl};
 `;
 
@@ -44,7 +45,7 @@ const HeroTitle = styled.h1`
   line-height: 1.2;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 3rem;
+    font-size: ${({ theme }) => theme.fontSizes['5xl']};
   }
 `;
 
@@ -58,7 +59,7 @@ const HeroSubtitle = styled.p`
 const CTAButton = styled.a`
   display: inline-block;
   padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing['2xl']}`};
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: 600;
   font-size: ${({ theme }) => theme.fontSizes.md};
@@ -69,6 +70,11 @@ const CTAButton = styled.a`
   &:hover {
     opacity: 0.9;
     text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.white};
+    outline-offset: 2px;
   }
 `;
 
@@ -93,7 +99,7 @@ const FeatureGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: ${({ theme }) => theme.spacing.xl};
-  max-width: 1024px;
+  max-width: ${({ theme }) => theme.breakpoints.lg};
   margin: 0 auto;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.sm}) {
@@ -116,7 +122,7 @@ const FeatureCard = styled.div`
 `;
 
 const FeatureIcon = styled.div`
-  font-size: 2rem;
+  font-size: ${({ theme }) => theme.fontSizes['4xl']};
 `;
 
 const FeatureTitle = styled.h3`
@@ -162,7 +168,7 @@ const PrimaryCTAButton = styled.a`
   display: inline-block;
   padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing['2xl']}`};
   background-color: ${({ theme }) => theme.colors.primary};
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.white};
   font-weight: 600;
   font-size: ${({ theme }) => theme.fontSizes.md};
   border-radius: ${({ theme }) => theme.borderRadius.full};
@@ -172,6 +178,11 @@ const PrimaryCTAButton = styled.a`
   &:hover {
     opacity: 0.85;
     text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.primary};
+    outline-offset: 2px;
   }
 `;
 
@@ -238,7 +249,11 @@ export default function HomeContent() {
           보일러플레이트를 활용해 빠르게 프로젝트를 시작하고, 팀과 함께
           성장하세요.
         </CTADescription>
-        <PrimaryCTAButton href="https://github.com">
+        <PrimaryCTAButton
+          href="https://github.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           GitHub에서 보기
         </PrimaryCTAButton>
       </CTASection>
