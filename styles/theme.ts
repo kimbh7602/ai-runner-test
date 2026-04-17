@@ -1,17 +1,31 @@
 export const theme = {
   colors: {
-    primary: '#0070f3',
-    secondary: '#1a1a2e',
-    background: '#ffffff',
-    surface: '#f5f5f5',
+    primary: '#6366f1',
+    secondary: '#0d0d1a',
+    background: '#0a0a0f',
+    surface: '#16161d',
     text: {
-      primary: '#171717',
-      secondary: '#6b7280',
+      primary: '#e5e5e5',
+      secondary: '#9ca3af',
     },
-    border: '#e5e7eb',
+    border: '#2a2a35',
     white: '#ffffff',
     error: '#ef4444',
     success: '#22c55e',
+    accent: {
+      light: '#a5b4fc',
+      muted: '#c7c9d1',
+    },
+    glow: 'rgba(99, 102, 241, 0.3)',
+    glowBorder: 'rgba(99, 102, 241, 0.4)',
+    glowCard: 'rgba(99, 102, 241, 0.1)',
+    glowHover: 'rgba(99, 102, 241, 0.08)',
+    star: '#f59e0b',
+    gradient: {
+      heroStart: '#0d0d1a',
+      heroMid: '#1e1b4b',
+      sectionDark: '#0d0d1f',
+    },
   },
   fonts: {
     sans: [
