@@ -38,6 +38,7 @@ import {
   TOP_PAGES,
   CHART_COLORS,
 } from '@/data/dashboard';
+import BorderGlowCard from '@/components/BorderGlowCard';
 
 /* ------------------------------------------------------------------ */
 /* PieChart 색상 팔레트 (방어적 순환 접근)                                 */
@@ -165,18 +166,11 @@ const KpiGrid = styled(motion.div)`
 
 const KpiCard = styled(motion.div)`
   background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.borderRadius.xl};
   padding: ${({ theme }) => theme.spacing.xl};
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.sm};
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.glowBorder};
-    box-shadow: 0 0 20px ${({ theme }) => theme.colors.glowCard};
-  }
 `;
 
 const KpiLabel = styled.div`
@@ -222,15 +216,8 @@ const ChartGrid = styled(motion.div)`
 
 const ChartCard = styled(motion.div)`
   background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.borderRadius.xl};
   padding: ${({ theme }) => theme.spacing.xl};
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.glowBorder};
-    box-shadow: 0 0 20px ${({ theme }) => theme.colors.glowCard};
-  }
 `;
 
 const ChartTitle = styled.h3`
@@ -250,17 +237,14 @@ const ChartArea = styled.div`
 
 const TableCard = styled(motion.div)`
   background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.borderRadius.xl};
   padding: ${({ theme }) => theme.spacing.xl};
-  margin-bottom: ${({ theme }) => theme.spacing['2xl']};
   overflow-x: auto;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+`;
 
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.glowBorder};
-    box-shadow: 0 0 20px ${({ theme }) => theme.colors.glowCard};
-  }
+/* TableCard를 감싸는 마진 래퍼 */
+const TableCardWrapper = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing['2xl']};
 `;
 
 const TableTitle = styled.h3`
@@ -401,27 +385,29 @@ export default function DashboardContent() {
             animate="visible"
           >
             {KPI_DATA.map((kpi) => (
-              <KpiCard key={kpi.label} variants={fadeUpVariants} transition={{ duration: 0.4 }}>
-                <KpiLabel>{kpi.label}</KpiLabel>
-                <KpiValue>{kpi.value}</KpiValue>
-                <KpiChange $positive={kpi.change >= 0}>
-                  {kpi.change >= 0 ? '▲' : '▼'} {Math.abs(kpi.change)}% 전월 대비
-                </KpiChange>
-                <KpiSparkline>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={kpi.sparkline.map((v, i) => ({ i, v }))}>
-                      <Line
-                        type="monotone"
-                        dataKey="v"
-                        stroke={kpi.change >= 0 ? CHART_COLORS.green : CHART_COLORS.primary}
-                        strokeWidth={2}
-                        dot={false}
-                        animationDuration={800}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </KpiSparkline>
-              </KpiCard>
+              <BorderGlowCard key={kpi.label}>
+                <KpiCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
+                  <KpiLabel>{kpi.label}</KpiLabel>
+                  <KpiValue>{kpi.value}</KpiValue>
+                  <KpiChange $positive={kpi.change >= 0}>
+                    {kpi.change >= 0 ? '▲' : '▼'} {Math.abs(kpi.change)}% 전월 대비
+                  </KpiChange>
+                  <KpiSparkline>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={kpi.sparkline.map((v, i) => ({ i, v }))}>
+                        <Line
+                          type="monotone"
+                          dataKey="v"
+                          stroke={kpi.change >= 0 ? CHART_COLORS.green : CHART_COLORS.primary}
+                          strokeWidth={2}
+                          dot={false}
+                          animationDuration={800}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </KpiSparkline>
+                </KpiCard>
+              </BorderGlowCard>
             ))}
           </KpiGrid>
 
@@ -433,184 +419,196 @@ export default function DashboardContent() {
             viewport={{ once: true, amount: 0.1 }}
           >
             {/* 월별 매출 추이 — LineChart */}
-            <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
-              <ChartTitle>월별 매출 추이</ChartTitle>
-              <ChartArea role="img" aria-label="올해와 작년 월별 매출 추이 비교 선형 차트">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={MONTHLY_REVENUE}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
-                    <XAxis dataKey="month" tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
-                    <YAxis
-                      tick={{ fill: CHART_COLORS.text, fontSize: 11 }}
-                      tickFormatter={(v: number) => `${(v / 1000000).toFixed(0)}M`}
-                    />
-                    <Tooltip
-                      content={
-                        <CustomTooltip
-                          formatter={(v) => `₩${v.toLocaleString()}`}
-                        />
-                      }
-                    />
-                    <Legend wrapperStyle={{ color: CHART_COLORS.text, fontSize: 12 }} />
-                    <Line
-                      type="monotone"
-                      dataKey="올해"
-                      stroke={CHART_COLORS.primary}
-                      strokeWidth={2}
-                      dot={{ r: 3, fill: CHART_COLORS.primary }}
-                      activeDot={{ r: 5 }}
-                      animationDuration={800}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="작년"
-                      stroke={CHART_COLORS.purple}
-                      strokeWidth={2}
-                      strokeDasharray="4 4"
-                      dot={{ r: 3, fill: CHART_COLORS.purple }}
-                      activeDot={{ r: 5 }}
-                      animationDuration={800}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartArea>
-            </ChartCard>
+            <BorderGlowCard>
+              <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
+                <ChartTitle>월별 매출 추이</ChartTitle>
+                <ChartArea role="img" aria-label="올해와 작년 월별 매출 추이 비교 선형 차트">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={MONTHLY_REVENUE}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                      <XAxis dataKey="month" tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
+                      <YAxis
+                        tick={{ fill: CHART_COLORS.text, fontSize: 11 }}
+                        tickFormatter={(v: number) => `${(v / 1000000).toFixed(0)}M`}
+                      />
+                      <Tooltip
+                        content={
+                          <CustomTooltip
+                            formatter={(v) => `₩${v.toLocaleString()}`}
+                          />
+                        }
+                      />
+                      <Legend wrapperStyle={{ color: CHART_COLORS.text, fontSize: 12 }} />
+                      <Line
+                        type="monotone"
+                        dataKey="올해"
+                        stroke={CHART_COLORS.primary}
+                        strokeWidth={2}
+                        dot={{ r: 3, fill: CHART_COLORS.primary }}
+                        activeDot={{ r: 5 }}
+                        animationDuration={800}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="작년"
+                        stroke={CHART_COLORS.purple}
+                        strokeWidth={2}
+                        strokeDasharray="4 4"
+                        dot={{ r: 3, fill: CHART_COLORS.purple }}
+                        activeDot={{ r: 5 }}
+                        animationDuration={800}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartArea>
+              </ChartCard>
+            </BorderGlowCard>
 
             {/* 카테고리별 매출 비율 — PieChart */}
-            <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
-              <ChartTitle>카테고리별 매출 비율</ChartTitle>
-              <ChartArea role="img" aria-label="카테고리별 매출 비율 도넛 차트">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={CATEGORY_SALES}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={55}
-                      outerRadius={90}
-                      paddingAngle={3}
-                      dataKey="value"
-                      animationDuration={800}
-                    >
-                      {CATEGORY_SALES.map((entry, index) => (
-                        <Cell
-                          key={entry.name}
-                          fill={PIE_COLORS[index % PIE_COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value) => [`${value}%`, '비율']}
-                      contentStyle={{
-                        background: CHART_COLORS.tooltip,
-                        border: `1px solid ${CHART_COLORS.grid}`,
-                        borderRadius: 8,
-                        fontSize: 12,
-                        color: '#e5e5e5',
-                      }}
-                    />
-                    <Legend
-                      wrapperStyle={{ color: CHART_COLORS.text, fontSize: 12 }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </ChartArea>
-            </ChartCard>
+            <BorderGlowCard>
+              <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
+                <ChartTitle>카테고리별 매출 비율</ChartTitle>
+                <ChartArea role="img" aria-label="카테고리별 매출 비율 도넛 차트">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={CATEGORY_SALES}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={90}
+                        paddingAngle={3}
+                        dataKey="value"
+                        animationDuration={800}
+                      >
+                        {CATEGORY_SALES.map((entry, index) => (
+                          <Cell
+                            key={entry.name}
+                            fill={PIE_COLORS[index % PIE_COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value) => [`${value}%`, '비율']}
+                        contentStyle={{
+                          background: CHART_COLORS.tooltip,
+                          border: `1px solid ${CHART_COLORS.grid}`,
+                          borderRadius: 8,
+                          fontSize: 12,
+                          color: '#e5e5e5',
+                        }}
+                      />
+                      <Legend
+                        wrapperStyle={{ color: CHART_COLORS.text, fontSize: 12 }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </ChartArea>
+              </ChartCard>
+            </BorderGlowCard>
 
             {/* 일별 방문자 수 — BarChart */}
-            <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
-              <ChartTitle>일별 방문자 수 (최근 14일)</ChartTitle>
-              <ChartArea role="img" aria-label="최근 14일간 일별 방문자 수 막대 차트">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={DAILY_VISITORS}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
-                    <XAxis dataKey="day" tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
-                    <YAxis tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar
-                      dataKey="방문자"
-                      fill={CHART_COLORS.primary}
-                      radius={[4, 4, 0, 0]}
-                      animationDuration={800}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartArea>
-            </ChartCard>
+            <BorderGlowCard>
+              <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
+                <ChartTitle>일별 방문자 수 (최근 14일)</ChartTitle>
+                <ChartArea role="img" aria-label="최근 14일간 일별 방문자 수 막대 차트">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={DAILY_VISITORS}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                      <XAxis dataKey="day" tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
+                      <YAxis tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Bar
+                        dataKey="방문자"
+                        fill={CHART_COLORS.primary}
+                        radius={[4, 4, 0, 0]}
+                        animationDuration={800}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartArea>
+              </ChartCard>
+            </BorderGlowCard>
 
             {/* 주간 성과 트렌드 — AreaChart */}
-            <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
-              <ChartTitle>주간 성과 트렌드</ChartTitle>
-              <ChartArea role="img" aria-label="최근 7일 페이지뷰 및 세션 수 영역 차트">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={WEEKLY_PERFORMANCE}>
-                    <defs>
-                      <linearGradient id="colorPageview" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={CHART_COLORS.primary} stopOpacity={0.3} />
-                        <stop offset="95%" stopColor={CHART_COLORS.primary} stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="colorSession" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={CHART_COLORS.green} stopOpacity={0.3} />
-                        <stop offset="95%" stopColor={CHART_COLORS.green} stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
-                    <XAxis dataKey="day" tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
-                    <YAxis tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend wrapperStyle={{ color: CHART_COLORS.text, fontSize: 12 }} />
-                    <Area
-                      type="monotone"
-                      dataKey="페이지뷰"
-                      stroke={CHART_COLORS.primary}
-                      strokeWidth={2}
-                      fill="url(#colorPageview)"
-                      animationDuration={800}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="세션"
-                      stroke={CHART_COLORS.green}
-                      strokeWidth={2}
-                      fill="url(#colorSession)"
-                      animationDuration={800}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </ChartArea>
-            </ChartCard>
+            <BorderGlowCard>
+              <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
+                <ChartTitle>주간 성과 트렌드</ChartTitle>
+                <ChartArea role="img" aria-label="최근 7일 페이지뷰 및 세션 수 영역 차트">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={WEEKLY_PERFORMANCE}>
+                      <defs>
+                        <linearGradient id="colorPageview" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={CHART_COLORS.primary} stopOpacity={0.3} />
+                          <stop offset="95%" stopColor={CHART_COLORS.primary} stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorSession" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={CHART_COLORS.green} stopOpacity={0.3} />
+                          <stop offset="95%" stopColor={CHART_COLORS.green} stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                      <XAxis dataKey="day" tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
+                      <YAxis tick={{ fill: CHART_COLORS.text, fontSize: 11 }} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend wrapperStyle={{ color: CHART_COLORS.text, fontSize: 12 }} />
+                      <Area
+                        type="monotone"
+                        dataKey="페이지뷰"
+                        stroke={CHART_COLORS.primary}
+                        strokeWidth={2}
+                        fill="url(#colorPageview)"
+                        animationDuration={800}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="세션"
+                        stroke={CHART_COLORS.green}
+                        strokeWidth={2}
+                        fill="url(#colorSession)"
+                        animationDuration={800}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </ChartArea>
+              </ChartCard>
+            </BorderGlowCard>
           </ChartGrid>
 
           {/* 분석 테이블 */}
-          <TableCard
-            variants={fadeUpVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.4 }}
-          >
-            <TableTitle>상위 페이지 분석</TableTitle>
-            <StyledTable>
-              <thead>
-                <tr>
-                  <Th>페이지</Th>
-                  <Th>방문 수</Th>
-                  <Th>평균 체류 시간</Th>
-                  <Th>이탈률</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {TOP_PAGES.map((row) => (
-                  <tr key={row.page}>
-                    <TdMono>{row.page}</TdMono>
-                    <Td>{row.방문수.toLocaleString()}</Td>
-                    <Td>{row.체류시간}</Td>
-                    <Td>{row.이탈률}</Td>
-                  </tr>
-                ))}
-              </tbody>
-            </StyledTable>
-          </TableCard>
+          <TableCardWrapper>
+            <BorderGlowCard>
+              <TableCard
+                variants={fadeUpVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.4 }}
+              >
+                <TableTitle>상위 페이지 분석</TableTitle>
+                <StyledTable>
+                  <thead>
+                    <tr>
+                      <Th>페이지</Th>
+                      <Th>방문 수</Th>
+                      <Th>평균 체류 시간</Th>
+                      <Th>이탈률</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {TOP_PAGES.map((row) => (
+                      <tr key={row.page}>
+                        <TdMono>{row.page}</TdMono>
+                        <Td>{row.방문수.toLocaleString()}</Td>
+                        <Td>{row.체류시간}</Td>
+                        <Td>{row.이탈률}</Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </StyledTable>
+              </TableCard>
+            </BorderGlowCard>
+          </TableCardWrapper>
         </Inner>
       </Page>
     </MotionConfig>
