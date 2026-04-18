@@ -748,7 +748,7 @@ export default function HomeContent() {
             transition={{ duration: 0.6, delay: 0.45 }}
           >
             <CTAButtonPrimary
-              href="#features"
+              href="/dashboard"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
