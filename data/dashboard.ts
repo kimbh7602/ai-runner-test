@@ -44,6 +44,7 @@ export const DAILY_VISITORS = [
 ];
 
 // 주간 성과 트렌드 (최근 7일)
+// 이탈률 필드는 현재 AreaChart에서 미사용 — 향후 확장 시 활용 예정
 export const WEEKLY_PERFORMANCE = [
   { day: '월', 페이지뷰: 4200, 세션: 1800, 이탈률: 38 },
   { day: '화', 페이지뷰: 5100, 세션: 2100, 이탈률: 34 },
