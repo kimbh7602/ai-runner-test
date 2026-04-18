@@ -20,6 +20,7 @@ export const theme = {
     glowBorder: 'rgba(99, 102, 241, 0.4)',
     glowCard: 'rgba(99, 102, 241, 0.1)',
     glowHover: 'rgba(99, 102, 241, 0.08)',
+    glowBorderGlow: 'rgba(99, 102, 241, 0.6)',
     star: '#f59e0b',
     gradient: {
       heroStart: '#0d0d1a',

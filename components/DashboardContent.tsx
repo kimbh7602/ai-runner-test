@@ -38,6 +38,7 @@ import {
   TOP_PAGES,
   CHART_COLORS,
 } from '@/data/dashboard';
+import BorderGlowCard from '@/components/BorderGlowCard';
 
 /* ------------------------------------------------------------------ */
 /* PieChart 색상 팔레트 (방어적 순환 접근)                                 */
@@ -165,18 +166,11 @@ const KpiGrid = styled(motion.div)`
 
 const KpiCard = styled(motion.div)`
   background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.borderRadius.xl};
   padding: ${({ theme }) => theme.spacing.xl};
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.sm};
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.glowBorder};
-    box-shadow: 0 0 20px ${({ theme }) => theme.colors.glowCard};
-  }
 `;
 
 const KpiLabel = styled.div`
@@ -222,15 +216,8 @@ const ChartGrid = styled(motion.div)`
 
 const ChartCard = styled(motion.div)`
   background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.borderRadius.xl};
   padding: ${({ theme }) => theme.spacing.xl};
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.glowBorder};
-    box-shadow: 0 0 20px ${({ theme }) => theme.colors.glowCard};
-  }
 `;
 
 const ChartTitle = styled.h3`
@@ -250,17 +237,14 @@ const ChartArea = styled.div`
 
 const TableCard = styled(motion.div)`
   background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.borderRadius.xl};
   padding: ${({ theme }) => theme.spacing.xl};
-  margin-bottom: ${({ theme }) => theme.spacing['2xl']};
   overflow-x: auto;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+`;
 
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.glowBorder};
-    box-shadow: 0 0 20px ${({ theme }) => theme.colors.glowCard};
-  }
+/* TableCard를 감싸는 마진 래퍼 */
+const TableCardWrapper = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing['2xl']};
 `;
 
 const TableTitle = styled.h3`
@@ -401,27 +385,29 @@ export default function DashboardContent() {
             animate="visible"
           >
             {KPI_DATA.map((kpi) => (
-              <KpiCard key={kpi.label} variants={fadeUpVariants} transition={{ duration: 0.4 }}>
-                <KpiLabel>{kpi.label}</KpiLabel>
-                <KpiValue>{kpi.value}</KpiValue>
-                <KpiChange $positive={kpi.change >= 0}>
-                  {kpi.change >= 0 ? '▲' : '▼'} {Math.abs(kpi.change)}% 전월 대비
-                </KpiChange>
-                <KpiSparkline>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={kpi.sparkline.map((v, i) => ({ i, v }))}>
-                      <Line
-                        type="monotone"
-                        dataKey="v"
-                        stroke={kpi.change >= 0 ? CHART_COLORS.green : CHART_COLORS.primary}
-                        strokeWidth={2}
-                        dot={false}
-                        animationDuration={800}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </KpiSparkline>
-              </KpiCard>
+              <BorderGlowCard key={kpi.label}>
+                <KpiCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
+                  <KpiLabel>{kpi.label}</KpiLabel>
+                  <KpiValue>{kpi.value}</KpiValue>
+                  <KpiChange $positive={kpi.change >= 0}>
+                    {kpi.change >= 0 ? '▲' : '▼'} {Math.abs(kpi.change)}% 전월 대비
+                  </KpiChange>
+                  <KpiSparkline>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={kpi.sparkline.map((v, i) => ({ i, v }))}>
+                        <Line
+                          type="monotone"
+                          dataKey="v"
+                          stroke={kpi.change >= 0 ? CHART_COLORS.green : CHART_COLORS.primary}
+                          strokeWidth={2}
+                          dot={false}
+                          animationDuration={800}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </KpiSparkline>
+                </KpiCard>
+              </BorderGlowCard>
             ))}
           </KpiGrid>
 
@@ -433,6 +419,7 @@ export default function DashboardContent() {
             viewport={{ once: true, amount: 0.1 }}
           >
             {/* 월별 매출 추이 — LineChart */}
+            <BorderGlowCard>
             <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
               <ChartTitle>월별 매출 추이</ChartTitle>
               <ChartArea role="img" aria-label="올해와 작년 월별 매출 추이 비교 선형 차트">
@@ -475,8 +462,10 @@ export default function DashboardContent() {
                 </ResponsiveContainer>
               </ChartArea>
             </ChartCard>
+            </BorderGlowCard>
 
             {/* 카테고리별 매출 비율 — PieChart */}
+            <BorderGlowCard>
             <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
               <ChartTitle>카테고리별 매출 비율</ChartTitle>
               <ChartArea role="img" aria-label="카테고리별 매출 비율 도넛 차트">
@@ -516,8 +505,10 @@ export default function DashboardContent() {
                 </ResponsiveContainer>
               </ChartArea>
             </ChartCard>
+            </BorderGlowCard>
 
             {/* 일별 방문자 수 — BarChart */}
+            <BorderGlowCard>
             <ChartCard variants={fadeUpVariants} transition={{ duration: 0.4 }}>
               <ChartTitle>일별 방문자 수 (최근 14일)</ChartTitle>
               <ChartArea role="img" aria-label="최근 14일간 일별 방문자 수 막대 차트">
@@ -579,38 +570,43 @@ export default function DashboardContent() {
                 </ResponsiveContainer>
               </ChartArea>
             </ChartCard>
+            </BorderGlowCard>
           </ChartGrid>
 
           {/* 분석 테이블 */}
-          <TableCard
-            variants={fadeUpVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.4 }}
-          >
-            <TableTitle>상위 페이지 분석</TableTitle>
-            <StyledTable>
-              <thead>
-                <tr>
-                  <Th>페이지</Th>
-                  <Th>방문 수</Th>
-                  <Th>평균 체류 시간</Th>
-                  <Th>이탈률</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {TOP_PAGES.map((row) => (
-                  <tr key={row.page}>
-                    <TdMono>{row.page}</TdMono>
-                    <Td>{row.방문수.toLocaleString()}</Td>
-                    <Td>{row.체류시간}</Td>
-                    <Td>{row.이탈률}</Td>
-                  </tr>
-                ))}
-              </tbody>
-            </StyledTable>
-          </TableCard>
+          <TableCardWrapper>
+            <BorderGlowCard>
+              <TableCard
+                variants={fadeUpVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.4 }}
+              >
+                <TableTitle>상위 페이지 분석</TableTitle>
+                <StyledTable>
+                  <thead>
+                    <tr>
+                      <Th>페이지</Th>
+                      <Th>방문 수</Th>
+                      <Th>평균 체류 시간</Th>
+                      <Th>이탈률</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {TOP_PAGES.map((row) => (
+                      <tr key={row.page}>
+                        <TdMono>{row.page}</TdMono>
+                        <Td>{row.방문수.toLocaleString()}</Td>
+                        <Td>{row.체류시간}</Td>
+                        <Td>{row.이탈률}</Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </StyledTable>
+              </TableCard>
+            </BorderGlowCard>
+          </TableCardWrapper>
         </Inner>
       </Page>
     </MotionConfig>
