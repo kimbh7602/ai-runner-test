@@ -10,16 +10,21 @@
  *   - GlowWrapper: padding 1px + background(정적 border 색 or glow gradient)
  *   - ::before pseudo-element: gradient overlay (hover 시 opacity 1)
  *   - GlowInner: 카드 배경으로 내부를 채워 1px padding만 border처럼 보이게 함
+ *
+ * GlowWrapper를 motion.div 기반으로 구성하여 framer-motion의 variant
+ * propagation chain이 유지됩니다 (staggerChildren 정상 동작).
  */
 
 import { useRef, useCallback } from 'react';
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 
 /* ------------------------------------------------------------------ */
 /* 스타일                                                                */
 /* ------------------------------------------------------------------ */
 
-const GlowWrapper = styled.div<{ $borderRadius: string }>`
+/* motion.div 기반 — framer-motion variant propagation 유지 */
+const GlowWrapper = styled(motion.div)<{ $borderRadius: string }>`
   position: relative;
   border-radius: ${({ $borderRadius }) => $borderRadius};
   /* 기본 상태: 정적 border 색을 배경으로 사용 (padding 1px으로 테두리처럼 보임) */
@@ -40,6 +45,10 @@ const GlowWrapper = styled.div<{ $borderRadius: string }>`
     opacity: var(--glow-opacity, 0);
     transition: opacity 0.35s ease;
     pointer-events: none;
+  }
+
+  /* hover 시에만 GPU 레이어 생성 — 상시 적용 시 불필요한 메모리 사용 방지 */
+  &:hover::before {
     will-change: opacity;
   }
 
